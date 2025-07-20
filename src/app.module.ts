@@ -1,12 +1,22 @@
 import { Module } from '@nestjs/common';
-import { AuhtModule } from './auth/auht.module';
-import { UserModule } from './user/user.module';
-import { BookmarkModule } from './bookmark/bookmark.module';
-import { AdminModule } from './admin/admin.module';
-
+import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
 @Module({
-  imports: [AuhtModule, UserModule, BookmarkModule, AdminModule],
+  imports: [ 
+    // MongooseModule.forRootAsync({
+    //   useFactory:  () => ({
+    //     uri: 'mongodb://localhost:27017/MCADOCS',
+    //   }),
+    // })
+    MongooseModule.forRoot(
+      // {connectionName : 'mongodb://localhost:27017/MCADOCS'}
+      'mongodb://localhost:27017/MCADOCS'
+    ),
+    AuthModule
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  
+}
