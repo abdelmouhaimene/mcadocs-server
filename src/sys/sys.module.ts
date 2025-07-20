@@ -3,7 +3,7 @@ import { SysService } from './sys.service';
 import { SysController } from './sys.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Sys, SysSchema, } from './schemas/sy.schema';
-import { RefreshToken, refreshTokenSchema } from 'src/auth/schema/refresh-token.schema';
+import { RefreshTokenSys, refreshTokenSysSchema } from './schemas/refreshTokenSys.schema';
 
 @Module({
   imports: [
@@ -12,8 +12,8 @@ import { RefreshToken, refreshTokenSchema } from 'src/auth/schema/refresh-token.
           schema : SysSchema
         },
         {
-          name: RefreshToken.name,
-          schema: refreshTokenSchema
+          name: RefreshTokenSys.name,
+          schema: refreshTokenSysSchema
         }
       ])],
   controllers: [SysController],
