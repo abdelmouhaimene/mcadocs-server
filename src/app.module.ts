@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SysModule } from './sys/sys.module';
 import config from './config/config'; 
 @Module({
   imports: [ 
@@ -26,10 +29,11 @@ import config from './config/config';
       global : true,
       inject: [ConfigService],
     }),
-    AuthModule
+    AuthModule,
+    SysModule
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {
   

@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { SignUpTdo } from './tdos/signUpTdo';
 import { LoginTdo } from './tdos/LoginDto';
 import { AuthService } from './auth.service';
-import { RefreshTokenTdo } from './tdos/RefreshTokensTdo';
+import { RefreshTokenTdo } from './tdos/refreshTokensTdo';
 
 @Controller('auth')
 export class AuthController {
