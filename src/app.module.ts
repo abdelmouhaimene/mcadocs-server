@@ -5,7 +5,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SysModule } from './sys/sys.module';
 import config from './config/config'; 
 @Module({
   imports: [ 
@@ -23,14 +22,13 @@ import config from './config/config';
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (config) => ({
+      useFactory:  (config) => ({
         secret: config.get('jwt.secret'),
       }),
       global : true,
       inject: [ConfigService],
     }),
     AuthModule,
-    SysModule
   ],
   controllers: [AppController],
   providers: [AppService],

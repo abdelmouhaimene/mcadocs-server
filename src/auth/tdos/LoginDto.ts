@@ -1,4 +1,4 @@
-import { IsString,MinLength,Length,IsIn } from "class-validator"
+import { IsString,MinLength,Length } from "class-validator"
 export class LoginTdo {
     @IsString()
     @Length(6)
@@ -7,7 +7,4 @@ export class LoginTdo {
     @IsString()
     @MinLength(6)
     password!: string;
-
-    @IsIn(['doc', 'dir'])
-    role!: 'doc' | 'dir';
 }

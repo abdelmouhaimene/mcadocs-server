@@ -18,6 +18,6 @@ export class SignUpTdo {
     @Match('password', { message: 'Passwords do not match' })
     repassword!: string;
 
-    @IsIn(['doc', 'dir'])
-    role!: 'doc' | 'dir';
+    @IsIn(['doc', 'dir','sys'])
+    role!: 'doc' | 'dir' | 'sys';
 }

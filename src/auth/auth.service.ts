@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Body, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+ 
+ 
+ 
+import {  ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { SignUpTdo } from './tdos/signUpTdo';
 import { InjectModel } from '@nestjs/mongoose';
 import { Admin } from './schema/admin.schema';
@@ -40,33 +40,34 @@ export class AuthService {
         if(!admin) throw new UnauthorizedException('login error, invalid matricule or password')
         const isPasswordValid = await bcrypt.compare(password, admin.password)
         if(!isPasswordValid) throw new UnauthorizedException('login error, invalid matricule or password')
-        return this.generateAdminTokens(admin._id)
+        return this.generateAdminTokens(admin)
     }
 
     async refreshTokens(refreshToken: string) {
         const existingToken = await this.RefreshTokenModel.findOne({token: refreshToken})
         if(!existingToken) throw new UnauthorizedException('invalid refresh token')
         if(existingToken.expDate < new Date()) throw new UnauthorizedException('refresh token expired')
-        const userId = existingToken.userId
-        const admin = await this.AdminModel.findById(userId)
+        const matricule = existingToken.matricule
+        const admin = await this.AdminModel.findOne({matricule})
         if(!admin) throw new UnauthorizedException('user not found')
 
-        return this.generateAdminTokens(userId.toString())
+        return this.generateAdminTokens(admin)
     }
 
-    async generateAdminTokens(userId) {
-        const payload = {userId}
+    async generateAdminTokens(admin) {
+        const {matricule, role} = admin
+        const payload = {matricule,role}
         const accessToken = this.jwtService.sign(payload,{})
         const refreshToken = uuidv4()
-        await this.storeRefreshToken(userId, refreshToken)
+        await this.storeRefreshToken(matricule, role, refreshToken)
         return {
             accessToken,
             refreshToken
         }
     }
 
-    async storeRefreshToken(userId: string, refreshToken: string) {
-        const existingToken = await this.RefreshTokenModel.findOne({userId})
+    async storeRefreshToken(matricule: string,role : string , refreshToken: string) {
+        const existingToken = await this.RefreshTokenModel.findOne({matricule})
         const expDate = new Date()
         expDate.setDate(expDate.getDate() + 42) 
         if (existingToken) {
@@ -75,7 +76,8 @@ export class AuthService {
             return existingToken.save()
         }
         const newRefreshToken = new this.RefreshTokenModel({
-            userId, 
+            matricule, 
+            role,
             token: refreshToken,
             expDate, 
         })
