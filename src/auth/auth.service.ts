@@ -1,10 +1,9 @@
  
  
  
-import {  ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { SignUpTdo } from './tdos/signUpTdo';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Admin } from './schema/admin.schema';
+import { Admin } from '../admins/schema/admin.schema';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt'
 import { LoginTdo } from './tdos/LoginDto';
@@ -19,20 +18,6 @@ export class AuthService {
         @InjectModel(RefreshToken.name) private RefreshTokenModel : Model<RefreshToken>,
         private jwtService : JwtService
     ) {}
-
-    async signup(signUpData : SignUpTdo) {
-        const {matricule, nom, prenom, password, role} = signUpData
-        const matriculeInUse = await this.AdminModel.findOne({matricule : matricule})
-        if(matriculeInUse) throw new ConflictException('matricule already in use')
-        const hashedPassword = await bcrypt.hash(password , 10)
-        await this.AdminModel.create({
-            matricule,
-            nom,
-            prenom,
-            role,
-            password: hashedPassword
-        })
-    }
 
     async login(loginTdo : LoginTdo) {
         const {matricule, password} = loginTdo
@@ -54,7 +39,7 @@ export class AuthService {
         return this.generateAdminTokens(admin)
     }
 
-    async generateAdminTokens(admin) {
+    async generateAdminTokens(admin : Admin) {
         const {matricule, role} = admin
         const payload = {matricule,role}
         const accessToken = this.jwtService.sign(payload,{})
@@ -93,5 +78,13 @@ export class AuthService {
         //     token: hashedRefreshToken
         // })
         // return newRefreshToken.save()
+    }
+
+    async logout(matricule: string) {
+        const result = await this.RefreshTokenModel.deleteOne({matricule})
+        if(result.deletedCount === 0) {
+            throw new UnauthorizedException('logout error, no refresh token found for this user')
+        }
+        return {message: 'logout successful'}
     }
 }   

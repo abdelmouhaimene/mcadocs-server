@@ -1,6 +1,6 @@
 import { IsString,MinLength,Length,IsIn } from "class-validator"
 import { Match } from "./passowrdValidator";
-export class SignUpTdo {
+export class CreateAdminDto {
     @IsString()
     @Length(6)
     matricule!: string;
