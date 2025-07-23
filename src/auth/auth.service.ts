@@ -20,6 +20,8 @@ export class AuthService {
     ) {}
 
     async login(loginTdo : LoginTdo) {
+        console.log('loginTdo', loginTdo);
+        
         const {matricule, password} = loginTdo
         const admin = await this.AdminModel.findOne({matricule : matricule})
         if(!admin) throw new UnauthorizedException('login error, invalid matricule or password')
@@ -40,12 +42,16 @@ export class AuthService {
     }
 
     async generateAdminTokens(admin : Admin) {
-        const {matricule, role} = admin
+        const {matricule, role, nom, prenom} = admin
         const payload = {matricule,role}
         const accessToken = this.jwtService.sign(payload,{})
         const refreshToken = uuidv4()
         await this.storeRefreshToken(matricule, role, refreshToken)
         return {
+            nom,
+            prenom,
+            matricule,
+            role,
             accessToken,
             refreshToken
         }
