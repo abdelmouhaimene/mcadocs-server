@@ -20,8 +20,6 @@ export class AuthService {
     ) {}
 
     async login(loginTdo : LoginTdo) {
-        console.log('loginTdo', loginTdo);
-        
         const {matricule, password} = loginTdo
         const admin = await this.AdminModel.findOne({matricule : matricule})
         if(!admin) throw new UnauthorizedException('login error, invalid matricule or password')

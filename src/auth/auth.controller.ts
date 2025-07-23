@@ -11,8 +11,6 @@ export class AuthController {
   @Post('login')
   async login(@Body() loginTdo: LoginTdo, @Res({ passthrough: true }) res: Response) {
     const data = await this.authService.login(loginTdo);
-
-
     res.cookie('refreshToken', data.refreshToken, {
       httpOnly: true,
       secure: true, 
@@ -27,7 +25,7 @@ export class AuthController {
 
   @Post('refresh')
   async refreshTokens(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const refreshToken = req.cookies?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken;    
     const data = await this.authService.refreshTokens(refreshToken);
 
     res.cookie('refreshToken', data.refreshToken, {
