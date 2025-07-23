@@ -5,7 +5,7 @@ export default () => ({
     },
     jwt: {
         secret: process.env.JWT_SECRET || 'Asdfghjklqwertyuiopzxcvbnm1010203042323',
-        expirationTime: process.env.JWT_EXPIRATION_TIME || '3600', // 1 hour
-        refreshExpirationTime: process.env.JWT_REFRESH_EXPIRATION_TIME || '30d'
+        expirationTime: process.env.JWT_EXPIRATION_TIME || '1d', // 1 hour
+        refreshExpirationTime: process.env.JWT_REFRESH_EXPIRATION_TIME || '45d'
     },
 })
