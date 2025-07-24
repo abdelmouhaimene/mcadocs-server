@@ -19,7 +19,7 @@ export class AuthController {
       maxAge: 42 * 24 * 60 * 60 * 1000, 
     });
 
-    const { refreshToken, ...rest } = data;
+    const { refreshToken, ...rest } = data; 
     return rest;
   }
 
@@ -38,7 +38,7 @@ export class AuthController {
 
     const { refreshToken: _, ...rest } = data;
     return rest;
-  }
+  } 
 
   @UseGuards(SelfGuard)
   @Post('logout')
