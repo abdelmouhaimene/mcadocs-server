@@ -9,7 +9,7 @@ import { Role } from 'src/types/tools';
 @Injectable()
 export class AdminsService {
   constructor(
-      @InjectModel(Admin.name) private AdminModel : Model<Admin>,
+      @InjectModel(Admin.name) private AdminModel : Model<Admin>
   ) {}
 
   async create(createAdminDto: CreateAdminDto) {

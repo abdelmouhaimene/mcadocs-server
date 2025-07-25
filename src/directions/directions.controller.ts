@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DirectionsService } from './directions.service';
 import { CreateDirectionDto } from './dto/create-direction.dto';
-import { UpdateDirectionDto } from './dto/update-direction.dto';
+import { Roles } from '../guards/roles.decorator';
+import { AuthGuard } from 'src/guards/auth.guard';
 
+@UseGuards(AuthGuard)
+@Roles('sys')
 @Controller('directions')
 export class DirectionsController {
   constructor(private readonly directionsService: DirectionsService) {}
@@ -17,18 +20,18 @@ export class DirectionsController {
     return this.directionsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.directionsService.findOne(+id);
+  @Get(':nom')
+  findOne(@Param('nom') nom: string) {
+    return this.directionsService.findOne(nom);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDirectionDto: UpdateDirectionDto) {
-    return this.directionsService.update(+id, updateDirectionDto);
+  @Patch(':nom')
+  update(@Param('nom') id: string, @Body() nom: string) {
+    return this.directionsService.update(nom);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.directionsService.remove(+id);
+  @Delete(':nom')
+  remove(@Param('nom') nom: string) {
+    return this.directionsService.remove(nom);
   }
 }
