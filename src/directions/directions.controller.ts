@@ -3,6 +3,7 @@ import { DirectionsService } from './directions.service';
 import { CreateDirectionDto } from './dto/create-direction.dto';
 import { Roles } from '../guards/roles.decorator';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { DirecteurDto } from './dto/create-directeur.dto';
 
 @UseGuards(AuthGuard)
 @Roles('sys')
@@ -11,27 +12,38 @@ export class DirectionsController {
   constructor(private readonly directionsService: DirectionsService) {}
 
   @Post()
-  create(@Body() createDirectionDto: CreateDirectionDto) {
-    return this.directionsService.create(createDirectionDto);
+  async dcreate(@Body() createDirectionDto: CreateDirectionDto) {
+    return await this.directionsService.create(createDirectionDto);
   }
 
   @Get()
-  findAll() {
-    return this.directionsService.findAll();
+  async findAll() {
+    return await this.directionsService.findAll();
   }
 
   @Get(':nom')
-  findOne(@Param('nom') nom: string) {
-    return this.directionsService.findOne(nom);
+  async findOne(@Param('nom') nom: string) {
+    return await this.directionsService.findOne(nom);
   }
 
   @Patch(':nom')
-  update(@Param('nom') id: string, @Body() nom: string) {
-    return this.directionsService.update(nom);
+  async update(@Param('nom') id: string, @Body() nom: string) {
+    return await this.directionsService.update(nom);
   }
 
   @Delete(':nom')
-  remove(@Param('nom') nom: string) {
-    return this.directionsService.remove(nom);
+  async remove(@Param('nom') nom: string) {
+    return await this.directionsService.remove(nom);
   }
+
+  @Post('directeur')
+  async setDirecteur(@Body() directeurDto : DirecteurDto ) {
+    return await this.directionsService.setDirecteur(directeurDto)
+  }
+
+  @Delete('directeur/:matricule')
+  async deleteDirecteur(@Param('matricule') matricule: string ) {
+    return await this.directionsService.deleteDirecteur(matricule)
+  }
+
 }

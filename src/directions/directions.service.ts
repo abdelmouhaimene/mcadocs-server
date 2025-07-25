@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Direction } from './schema/direction.schema';
 import { ClientSession, Model } from 'mongoose';
 import { Directeur } from './schema/directeur.schema';
-
+import { DirecteurDto } from './dto/create-directeur.dto';
 @Injectable()
 export class DirectionsService {
   private readonly logger = new Logger(DirectionsService.name)
@@ -37,8 +37,8 @@ export class DirectionsService {
 
     // Find and update the direction
     const updatedDirection = await this.DirectionModel.findOneAndUpdate(
-      { name: nom }, // Find by current name
-      { name: nom }, // Update with new name (same in this case, but you might want different logic)
+      { nom: nom }, // Find by current name
+      { nom: nom }, // Update with new name (same in this case, but you might want different logic)
       { 
         new: true,     // Return the updated document
         upsert: false  // Don't create if doesn't exist
@@ -53,9 +53,8 @@ export class DirectionsService {
     return updatedDirection;
   }
 
-
   async remove(nom: string) {
-  if (!nom || nom === '') {
+    if (!nom || nom === '') {
       throw new BadRequestException('Direction name is required');
     }
 
@@ -65,8 +64,8 @@ export class DirectionsService {
       session.startTransaction();
 
       const [directeurResult, directionResult] = await Promise.all([
-        this.DirecteurModel.deleteMany({ Direction: nom }).session(session),
-        this.DirectionModel.deleteOne({ name: nom }).session(session),
+        this.DirecteurModel.deleteMany({ direction: nom }).session(session),
+        this.DirectionModel.deleteOne({ nom: nom }).session(session),
       ]);
 
       await session.commitTransaction();
@@ -99,4 +98,21 @@ export class DirectionsService {
       }
     }
   }
+
+  async setDirecteur(directeurDto : DirecteurDto){
+    const {matricule,direction} = directeurDto
+    if (!direction || !matricule) throw new BadRequestException('Direction et directeur is required');
+    const isDirecteurInUse = await this.DirecteurModel.find({matricule : matricule})
+    if(isDirecteurInUse) throw new ConflictException('directeur already in use')
+    return await this.DirecteurModel.create({
+      matricule,
+      direction 
+    })
+  }
+
+  async deleteDirecteur(matricule : string){
+    if (!matricule ) throw new BadRequestException('Direction et directeur is required');
+    return await this.DirecteurModel.deleteOne({ matricule : matricule })
+  }
+
 }
