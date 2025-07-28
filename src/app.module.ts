@@ -7,6 +7,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminsModule } from './admins/admins.module';
 import { DirectionsModule } from './directions/directions.module';
+import { DocsModule } from './docs/docs.module';
+import { DemandesModule } from './demandes/demandes.module';
 import config from './config/config'; 
 @Module({
   imports: [ 
@@ -33,6 +35,8 @@ import config from './config/config';
     AuthModule,
     AdminsModule,
     DirectionsModule,
+    DocsModule,
+    DemandesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
