@@ -1,1 +1,17 @@
-export class CreateDemandeDto {}
+import { IsBoolean, IsNumber, IsString } from "class-validator"
+export class CreateDemandeDto {
+    @IsString()
+    nom!: string;
+    
+    @IsString()
+    matricule!: string;
+
+    @IsBoolean()
+    consulte !: boolean;
+
+    @IsString()
+    filePath !: string;
+  
+    @IsNumber()
+    size !: number;
+}
