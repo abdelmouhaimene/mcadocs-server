@@ -4,7 +4,7 @@ import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class Demande extends Document {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   nom !: string;
 
   @Prop({ required: true, ref: 'directeur', type: String})
@@ -24,6 +24,9 @@ export class Demande extends Document {
   // Option 2 !: Store file path (if saving to disk/cloud)
   @Prop()
   filePath !: string;
+
+  @Prop({ required: true })  // Add this
+  mimetype !: string;
 
   @Prop()
   size !: number;
