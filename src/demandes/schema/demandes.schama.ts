@@ -13,6 +13,8 @@ export class Demande extends Document {
   @Prop({ required: true, default : false })
   consulte !: boolean;
 
+  @Prop({ required: true, default : false })
+  accepte !: boolean;
 
   // Option 1: Store PDF as binary data
   // @Prop({ type: Buffer })

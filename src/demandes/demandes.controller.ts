@@ -3,6 +3,7 @@ import { DemandesService } from './demandes.service';
 // import { CreateDemandeDto } from './dto/create-demande.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+
 @Controller('demandes')
 export class DemandesController {
   constructor(private readonly demandesService: DemandesService) {}
@@ -17,13 +18,13 @@ export class DemandesController {
     return this.demandesService.uploadDocumentToDisk(nom,matricule, file, uploadPath);
   }
  
-   @Get('by-name/:nom') // e.g., GET /demandes/by-name/MyDocument
+  @Get('download/:nom') // e.g., GET /demandes/by-name/MyDocument
   async getFileByName(
     @Param('nom') nom: string,
     @Res() res: Response,
   ) {
     try {
-      const { fileStream, metadata } = await this.demandesService.getFileByName(nom);
+      const { fileStream, metadata } = await this.demandesService.downloadFileByName(nom);
 
       // Set headers for file download
       res.set({
@@ -41,28 +42,44 @@ export class DemandesController {
       throw error;
     }
   }
-  // @Post()
-  // create(@Body() createDemandeDto: CreateDemandeDto) {
-  //   return this.demandesService.create(createDemandeDto);
-  // }
 
-  // @Get()
-  // findAll() {
-  //   return this.demandesService.findAll();
-  // }
+  @Get('all')
+  async findAll() {
+    return this.demandesService.findAll();
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.demandesService.findOne(+id);
-  // }
+  @Get('all/consulte')
+  async findAllByConsulte(@Body('status') status: boolean) {
+    return this.demandesService.findAllByConsulte(status);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateDemandeDto: UpdateDemandeDto) {
-  //   return this.demandesService.update(+id, updateDemandeDto);
-  // }
+  @Get('all/accepte')
+  async findAllByAccepte(@Body('status') status: boolean) {
+    return this.demandesService.findAllByAccepte(status);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.demandesService.remove(+id);
-  // }
+  @Get('all/matricule/:matricule')
+  async findAllByMatricule(@Param('matricule') matricule: string) {
+    return this.demandesService.findAllByMatricule(matricule);
+  }
+
+  @Patch('accepte/:nom')
+  async setAccepte(@Param('nom') nom: string,@Body('status') status: boolean) {
+    return this.demandesService.setAccepte(nom,status);
+  }
+  
+  @Patch('consulte/:nom')
+  async setConsulte(@Param('nom') nom: string,@Body('status') status: boolean) {
+    return this.demandesService.setConsulte(nom);
+  }
+
+  @Get('all/direction/:direction')
+  async findAllByDirection(@Param('direction') direction: string) { 
+    return this.demandesService.findAllByDirection(direction);
+  }
+
+  @Get('all/directeur/:matricule')
+  async findAllByDirecteur(@Param('matricule') matricule: string) {
+    return this.demandesService.findAllByMatricule(matricule);
+  }
 }
