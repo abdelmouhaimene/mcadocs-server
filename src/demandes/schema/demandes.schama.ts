@@ -16,6 +16,8 @@ export class Demande extends Document {
   @Prop({ required: true, default : false })
   accepte !: boolean;
 
+  @Prop({ required: true, default : false })
+  integre !: boolean;
   // Option 1: Store PDF as binary data
   // @Prop({ type: Buffer })
   // file !: Buffer;

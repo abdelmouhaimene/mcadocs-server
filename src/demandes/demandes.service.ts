@@ -124,5 +124,21 @@ export class DemandesService {
     return await demande.save();
   }
 
+  async deleteOne(nom: string) {
+    const demande = await this.DemandeModel.findOne({ nom }).exec();
+    if (!demande) {
+      throw new NotFoundException(`Demande with name "${nom}" not found`);
+    }
+    if (demande.accepte === true) {
+      throw new BadRequestException(`Demande "${nom}" has already been accepted and cannot be deleted`);
+    }
+    // Delete the file from disk
+    if (existsSync(demande.filePath)) {
+      const fs = require('fs');
+      fs.unlinkSync(demande.filePath);
+    } 
+    // Delete the document from MongoDB
+    return await this.DemandeModel.deleteOne({ nom }).exec(); 
+  }
 
 }
