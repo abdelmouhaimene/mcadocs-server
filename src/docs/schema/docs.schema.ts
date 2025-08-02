@@ -1,6 +1,6 @@
 import {Schema, SchemaFactory, Prop} from '@nestjs/mongoose'
 import { Document } from 'mongoose'
-@Schema({})
+@Schema({timestamps: true })
 export class Doc extends Document {
 
   @Prop({required : true, unique: true})
@@ -8,12 +8,15 @@ export class Doc extends Document {
   @Prop({required : true})
   nom !: string
   @Prop({required : true})
-  DateDeCreation !: Date
+  version !: string
   @Prop({required : true})
-  password !: string
+  description !: string 
+  @Prop({required : true, ref: 'directeur', type: String})
+  creePar !: string
+  @Prop({required : true , ref: 'directeur', type: String})
+  validePar !: string
   @Prop({required : true})
-  role !: 'doc' | 'dir' | 'sys' 
-
+  path !: string
 }
 
 export const DocSchema = SchemaFactory.createForClass(Doc)
