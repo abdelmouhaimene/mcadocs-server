@@ -17,18 +17,28 @@ export class DocsController {
     return this.docsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.docsService.findOne(+id);
+  @Get(':nom')
+  findOne(@Param('nom') nom: string) {
+    return this.docsService.findOne(+nom);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDocDto: UpdateDocDto) {
-    return this.docsService.update(+id, updateDocDto);
+  @Get('direction/:direction')
+  findAllByDirection(@Param('direction') direction: string) { 
+    return this.docsService.findAllByDirection(direction);
+  }
+  
+  @Get('directeur/:matricule')
+  findAllByDirecteur(@Param('matricule') matricule: string) {   
+    return this.docsService.findAllByDirecteur(matricule);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.docsService.remove(+id);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateDocDto: UpdateDocDto) {
+  //   return this.docsService.update(+id, updateDocDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.docsService.remove(+id);
+  // }
 }
