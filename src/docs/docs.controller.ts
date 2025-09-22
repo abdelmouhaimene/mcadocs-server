@@ -32,7 +32,7 @@ export class DocsController {
     return this.docsService.findAllByDirecteur(matricule);
   }
 
-  // @Patch(':id')
+  // @Patch(':id') bbbbbbbb            
   // update(@Param('id') id: string, @Body() updateDocDto: UpdateDocDto) {
   //   return this.docsService.update(+id, updateDocDto);
   // }
