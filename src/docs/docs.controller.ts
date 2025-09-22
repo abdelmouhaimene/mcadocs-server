@@ -36,6 +36,7 @@ export class DocsController {
   // update(@Param('id') id: string, @Body() updateDocDto: UpdateDocDto) {
   //   return this.docsService.update(+id, updateDocDto);
   // }
+    // }
 
   // @Delete(':id')
   // remove(@Param('id') id: string) {
