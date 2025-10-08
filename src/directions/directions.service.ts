@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Direction } from './schema/direction.schema';
 import { ClientSession, Model } from 'mongoose';
 import { Directeur } from './schema/directeur.schema';
+import { Admin } from 'src/admins/schema/admin.schema';
 import { DirecteurDto } from './dto/create-directeur.dto';
 import { UpdateDirectionDto } from './dto/update-direction.dto';
 @Injectable()
@@ -11,7 +12,8 @@ export class DirectionsService {
   private readonly logger = new Logger(DirectionsService.name)
   constructor(
     @InjectModel(Direction.name) private DirectionModel : Model<Direction>,
-    @InjectModel(Directeur.name) private DirecteurModel : Model<Directeur>
+    @InjectModel(Directeur.name) private DirecteurModel : Model<Directeur>,
+    @InjectModel(Admin.name) private AdminModel : Model<Admin>
   ) {}
 
   async create(createDirectionDto: CreateDirectionDto) {
@@ -121,6 +123,11 @@ export class DirectionsService {
   async setDirecteur(directeurDto : DirecteurDto){
     const {matricule,direction} = directeurDto
     if (!direction || !matricule) throw new BadRequestException('Direction et directeur is required');
+    const directionExists = await this.DirectionModel.findOne({nom : direction})
+    if(!directionExists) throw new BadRequestException('Direction not found')
+    const adminExists = await this.AdminModel.findOne({matricule : matricule})
+    if(!adminExists) throw new BadRequestException('Admin not found')
+    if(adminExists.role !== 'dir') throw new BadRequestException('Admin role must be directeur')
     const isDirecteurInUse = await this.DirecteurModel.findOne({matricule : matricule})
     if(isDirecteurInUse) throw new ConflictException('directeur already in use')
     return await this.DirecteurModel.create({
@@ -134,59 +141,79 @@ export class DirectionsService {
     return await this.DirecteurModel.deleteOne({ matricule : matricule })
   }
 
-async getAdminsGroupedByDirection() {
-  try {
-    const result = await this.DirecteurModel.aggregate([
-      // First lookup: Join with Admin collection
+  async getAdminsGroupedByDirection() {
+    try {
+      const result = await this.DirectionModel.aggregate([
+        // First lookup: Join with Admin collection
+        {
+          $lookup: {
+            from: 'directeurs',           // Make sure this matches your MongoDB collection name
+            localField: 'nom',  // Field in Directeur collection
+            foreignField: 'direction', // Field in Admin collection
+            as: 'directeurs'
+          }
+        },
+        { $unwind: { path: "$directeurs", preserveNullAndEmptyArrays: true } },
+        {
+          $lookup: {
+            from: "admins",
+            localField: "directeurs.matricule",
+            foreignField: "matricule",
+            as: "admin"
+          }
+        },
+        { $unwind: { path: "$admin", preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: "$nom",
+            admins: {
+              $push: {
+                matricule: "$admin.matricule",
+                nom: "$admin.nom",
+                prenom: "$admin.prenom"
+              }
+            },
+            count: { $sum: { $cond: [{ $ifNull: ["$admin.matricule", false] }, 1, 0] } }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            nom: "$_id",
+            count: 1,
+            admins: 1
+          }
+        },
+        { $sort: { nom: 1 } } // optional
+      ]).exec();
+
+      return result;
+    } catch (error) {
+      this.logger.error('Failed to group admins by direction', error);
+      throw new BadRequestException('Failed to retrieve grouped data');
+    }
+  }
+
+  async getAllDirecteurs() {
+    return await this.DirecteurModel.aggregate([
       {
         $lookup: {
-          from: 'admins',           // Make sure this matches your MongoDB collection name
-          localField: 'matricule',  // Field in Directeur collection
-          foreignField: 'matricule', // Field in Admin collection
-          as: 'adminData'
+          from: "admins",           
+          localField: "matricule", 
+          foreignField: "matricule", 
+          as: "adminData"
         }
       },
-      // Filter out documents without matching admin
+      { $unwind: "$adminData" },
       {
-        $match: {
-          'adminData.0': { $exists: true } // Only keep Directeurs with matching Admin
-        }
-      },
-      // Unwind the admin array
-      { $unwind: '$adminData' },
-      // Group by direction
-      {
-        $group: {
-          _id: '$direction',  // Group by the direction field
-          directionName: { $first: '$direction' },
-          admins: {
-            $push: {
-              matricule: '$adminData.matricule',
-              nom: '$adminData.nom',
-              prenom: '$adminData.prenom'
-            }
-          },
-          count: { $sum: 1 } // Optional: count of admins per direction
-        }
-      },
-      // Project to clean up output
-      {
-        $project: {
-          _id: 0,
-          direction: '$directionName',
-          admins: 1,
-          count: 1 // Optional
-        }
-      },
-      // Sort by direction name (optional)
-      { $sort: { direction: 1 } }
-    ]).exec();
-
-    return result;
-  } catch (error) {
-    this.logger.error('Failed to group admins by direction', error);
-    throw new BadRequestException('Failed to retrieve grouped data');
+          $project: {
+            _id: 0,
+            matricule: 1,
+            departement: 1,
+            nom: "$adminData.nom",
+            prenom: "$adminData.prenom"
+          }
+        },
+    ]);
   }
-}
-
 }

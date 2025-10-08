@@ -52,4 +52,9 @@ export class DirectionsController {
     return await this.directionsService.remove(nom);
   }
 
+  @Get('directeurs')
+  async getAllDirecteurs() {
+    return this.directionsService.getAllDirecteurs()
+  }
+
 }
