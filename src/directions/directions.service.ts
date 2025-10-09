@@ -195,7 +195,7 @@ export class DirectionsService {
   }
 
   async getAllDirecteurs() {
-    return await this.DirecteurModel.aggregate([
+    const result = await this.DirecteurModel.aggregate([
       {
         $lookup: {
           from: "admins",           
@@ -209,11 +209,12 @@ export class DirectionsService {
           $project: {
             _id: 0,
             matricule: 1,
-            departement: 1,
             nom: "$adminData.nom",
-            prenom: "$adminData.prenom"
+            prenom: "$adminData.prenom",
+            direction: 1
           }
         },
     ]);
+    return result;
   }
 }

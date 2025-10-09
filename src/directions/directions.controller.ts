@@ -27,6 +27,11 @@ export class DirectionsController {
     return await this.directionsService.getAdminsGroupedByDirection()
   }
 
+    @Get('directeurs')
+  async getAllDirecteurs() {
+    return this.directionsService.getAllDirecteurs()
+  }
+
   @Post()
   async dcreate(@Body() createDirectionDto: CreateDirectionDto) {
     return await this.directionsService.create(createDirectionDto);
@@ -52,9 +57,5 @@ export class DirectionsController {
     return await this.directionsService.remove(nom);
   }
 
-  @Get('directeurs')
-  async getAllDirecteurs() {
-    return this.directionsService.getAllDirecteurs()
-  }
 
 }
