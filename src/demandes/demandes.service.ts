@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Demande } from './schema/demandes.schama';
@@ -24,6 +24,8 @@ export class DemandesService {
     file: Express.Multer.File,
     uploadPath: string,
   ){          
+    const nameInUse = await this.DemandeModel.findOne({nom : documentName})
+    if(nameInUse) throw new ConflictException('documentName already in use')
     // const fileType = await fileTypeFromBuffer (file.buffer);
     if (file?.mimetype !== 'application/pdf') {
       throw new BadRequestException('Only PDF files are allowed');

@@ -39,7 +39,7 @@ export class DemandesController {
       res.set({
         'Content-Type': metadata.mimetype,
         'Content-Length': metadata.size,
-        'Content-Disposition': `attachment; filename="${metadata.nom}.pdf"`,
+        'Content-Disposition': `inline; filename="${metadata.nom}.pdf"`,
       });
 
       // Pipe the file stream to the response
