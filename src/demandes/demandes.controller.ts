@@ -76,6 +76,13 @@ export class DemandesController {
     return this.demandesService.findAllByMatricule(matricule);
   }
 
+  @Roles('dir')
+  @Patch('update/:nom')
+  @UseInterceptors(FileInterceptor('newFile'))
+  async updateDemande(@Param('nom') nom: string,@Body('newNom') newNom: string , @UploadedFile() newFile: Express.Multer.File  ) {
+    return this.demandesService.updateOne(nom, newNom, newFile);
+  }
+
   @Roles('doc')
   @Patch('accepte/:nom')
   async setAccepte(@Param('nom') nom: string,@Body('status') status: boolean) {

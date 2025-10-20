@@ -89,7 +89,7 @@ export class DemandesService {
     return await this.DemandeModel.find({accepte : status}).exec();
   }
 
-  async findAllByMatricule(matricule : string) {
+  async findAllByMatricule(matricule : string) {    
     return await this.DemandeModel.find({ matricule : matricule}).exec();
   }
 
@@ -123,6 +123,42 @@ export class DemandesService {
       throw new BadRequestException(`Demande "${nom}" has already been inaccepted`);
     } 
     demande.accepte = status;
+    return await demande.save();
+  }
+
+  async updateOne(nom: string, newNom: string, newFile: Express.Multer.File) {
+    const demande = await this.DemandeModel.findOne({ nom }).exec();
+    if (!demande) {
+      throw new NotFoundException(`Demande with name "${nom}" not found`);
+    }
+    if (demande.accepte === true || demande.integre === true) {
+      throw new BadRequestException(`Demande "${nom}" has already been accepted and cannot be modified`);
+    }
+    if (newNom && (newNom !== '') && (nom !== newNom)) {
+      const nameInUse = await this.DemandeModel.findOne({ nom: newNom }).exec();
+      if (nameInUse) {
+        throw new ConflictException(`Demande name "${newNom}" is already in use`);
+      }
+      demande.nom = newNom;
+    }
+    if (newFile) {
+      if (newFile.mimetype !== 'application/pdf') {
+        throw new BadRequestException('Only PDF files are allowed');
+      }
+      // Delete the old file from disk
+      if (existsSync(demande.filePath)) {
+        const fs = require('fs');
+        fs.unlinkSync(demande.filePath);
+      }      
+      const fileName = `${Date.now()}-${newFile.originalname}`;
+      const uploadPath = join(__dirname, '..', '..', 'demandes');
+      const filePath = join(uploadPath, fileName);
+      // Save new file to disk
+      await writeFile(filePath, newFile.buffer);
+      demande.filePath = filePath;
+      demande.mimetype = newFile.mimetype;
+      demande.size = newFile.size;
+    }
     return await demande.save();
   }
 
